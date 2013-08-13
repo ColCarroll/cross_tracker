@@ -1,5 +1,36 @@
 {% extends "base.html" %}
 {% block title %} - Home{% endblock %}
+
 {% block content %}
-<p>Hello!</p>
+<div class="col-lg-6">
+  <img src="{{ url_for("static", filename="front_banner.jpg") }}" class="img-responsive">
+</div>
+<div class="col-lg-6">
+  <div class="btn-toolbar">
+    <button type="button" class="btn btn-default btn-lg btn-block">
+      <img class="img-menu img-responsive" src="{{ url_for("static", filename = "team.jpg") }}">
+      <span class="span-menu">
+        Teams
+      </span>
+    </button>
+    <button type="button" class="btn btn-default btn-lg btn-block">
+      <img class="img-menu img-responsive" src="{{ url_for("static", filename = "meet.jpg") }}">
+      <span class="span-menu">
+        Meets
+      </span>
+    </button>
+    <button type="button" class="btn btn-default btn-lg btn-block">
+      <img class="img-menu img-responsive" src="{{ url_for("static", filename = "course.jpg") }}">
+      <span class="span-menu">
+        Courses
+      </span>
+    </button>
+    <button type="button" class="btn btn-default btn-lg btn-block">
+      <img class="img-menu img-responsive" src="{{ url_for("static", filename = "prediction.jpg") }}">
+      <span class="span-menu">
+        Predictions
+      </span>
+    </button>
+  </div>
+</div>
 {% endblock %}

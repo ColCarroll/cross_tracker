@@ -10,14 +10,18 @@
     <meta charset="utf-8">
 
     <link href="{{ url_for("static", filename = "bootstrap/dist/css/bootstrap.css") }}" rel="stylesheet">
+    <link href="{{ url_for("static", filename = "styles.css") }}" rel="stylesheet">
     <style>
       body {
-        padding-top: 115px;
+        padding-top: 75px;
         }
       @media (max-width: 979px) {
         body {
           padding-top: 0px;
         }
+      }
+      html, body{
+        height: 100%;
       }
      </style>
     <!-- SUPPORT FOR IE6-8 OF HTML5 ELEMENTS -->
@@ -37,15 +41,8 @@
     <div class="navbar navbar-fixed-top">
         <div class="navbar-inner">
             <div class="container">
-              <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-              </a>
               <a class="navbar-brand" href="#">Cross Country Tracker</a>
               <div class="nav-collapse">
-                <ul class="nav">
-                </ul>
                 {% block navbar_right %}
                 <ul class="nav pull-right">
                   {% if not session.logged_in %}
@@ -55,26 +52,28 @@
                   {% endif %}
                 </ul>
                 {% endblock %}
-              </div><!--/.nav-collapse -->
+              </div>
             </div>
           </div>
     </div>
     {% endblock %}
 
     <div class="container page">
-        <div class="content">
-          {% block content %}
-          {% endblock %}
-        </div>
-
-        <hr>
-
-        {% block footer %}
-        <footer class="footer">
-        </footer>
+      <div class="content col-lg-12">
+        {% block content %}
         {% endblock %}
+      </div>
+    </div>
+
+    <hr>
+
+    <footer class="bs-footer">
+        {% block footer %}
+        {% endblock %}
+    </footer>
 
     </div>
+
     {% block js_footer %}
       <script src="{{ url_for("static", filename = "bootstrap/dist/js/bootstrap.js") }}"></script>
     {% endblock %}
