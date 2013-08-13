@@ -39,3 +39,6 @@ venv
 
 # Swap files
 *.swp
+
+# Secret file
+.creds
