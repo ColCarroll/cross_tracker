@@ -14,14 +14,17 @@ import parser
 
 APP = Flask(__name__)
 # Keep passwords and credentials in a .creds file
-CREDS = json.load(open(".creds"))
+try:
+  CREDS = json.load(open(".creds"))
 
-APP.config.update(
-    DEBUG = True,
-)
+  APP.config.update(
+      DEBUG = True,
+  )
 
-APP.config["SECRET_KEY"] = "\xc62{{x.\xf6\xe1_K\xf3\x85)~\xb3E\xce)\x89j\x823|'"
-APP.config["UPLOAD_FOLDER"] = os.path.join(APP.root_path, "raw_data")
+  APP.config["SECRET_KEY"] = "\xc62{{x.\xf6\xe1_K\xf3\x85)~\xb3E\xce)\x89j\x823|'"
+  APP.config["UPLOAD_FOLDER"] = os.path.join(APP.root_path, "raw_data")
+except:
+  pass
 
 #----------------------------------------
 # database
