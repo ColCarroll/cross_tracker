@@ -23,7 +23,7 @@ try:
 
   APP.config["SECRET_KEY"] = "\xc62{{x.\xf6\xe1_K\xf3\x85)~\xb3E\xce)\x89j\x823|'"
   APP.config["UPLOAD_FOLDER"] = os.path.join(APP.root_path, "raw_data")
-except:
+except NameError:
   pass
 
 #----------------------------------------
@@ -33,15 +33,18 @@ except:
 from mongoengine import connect
 from flask.ext.mongoengine import MongoEngine
 
-APP.config["MONGODB_DB"] = CREDS['DB_NAME']
-connect(CREDS['DB_NAME'],
-    host='mongodb://' +
-    CREDS['DB_USERNAME'] +
-    ':' +
-    CREDS['DB_PASSWORD'] +
-    '@' +
-    CREDS['DB_HOST_ADDRESS'])
-DB = MongoEngine(APP)
+try:
+  APP.config["MONGODB_DB"] = CREDS['DB_NAME']
+  connect(CREDS['DB_NAME'],
+      host='mongodb://' +
+      CREDS['DB_USERNAME'] +
+      ':' +
+      CREDS['DB_PASSWORD'] +
+      '@' +
+      CREDS['DB_HOST_ADDRESS'])
+  DB = MongoEngine(APP)
+except NameError:
+  pass
 
 #----------------------------------------
 # controllers
