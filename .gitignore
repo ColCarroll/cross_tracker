@@ -37,6 +37,9 @@ nosetests.xml
 # Virtual environment
 venv
 
+# Data files
+raw_data/
+
 # Swap files
 *.swp
 

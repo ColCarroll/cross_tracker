@@ -10,7 +10,8 @@
     <meta charset="utf-8">
 
     <link href="{{ url_for("static", filename = "bootstrap/dist/css/bootstrap.css") }}" rel="stylesheet">
-    <link href="{{ url_for("static", filename = "styles.css") }}" rel="stylesheet">
+    <link href="{{ url_for("static", filename = "css/styles.css") }}" rel="stylesheet">
+    {% block css_header %}{% endblock %}
     <style>
       body {
         padding-top: 75px;
@@ -31,32 +32,36 @@
 
     <link rel="shortcut icon" href="{{ url_for('static', filename='ico/favicon.ico') }}">
 
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
     {% endblock %}
   </head>
 
   <body>
 
-    {% block navbar %}
-    <div class="navbar navbar-fixed-top">
-        <div class="navbar-inner">
-            <div class="container">
-              <a class="navbar-brand" href="#">Cross Country Tracker</a>
-              <div class="nav-collapse">
-                {% block navbar_right %}
-                <ul class="nav pull-right">
-                  {% if not session.logged_in %}
-                    <li><a href="#">Login or Signup</a></li>
-                  {% else %}
-                    <li><a href="#">Logout</a></li>
-                  {% endif %}
-                </ul>
-                {% endblock %}
-              </div>
-            </div>
-          </div>
-    </div>
-    {% endblock %}
+    <header class="navbar navbar-fixed-top" role="banner">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="{{ url_for("index") }}">Cross Country Tracker</a>
+        </div>
+
+      <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="navbar-collapse navbar-responsive-collapse" role="navigation">
+          <ul class="nav navbar-nav">
+            <li><a href="{{ url_for("teams") }}">Teams</a></li>
+            <li><a href="{{ url_for("meets") }}">Meets</a></li>
+            <li><a href="{{ url_for("courses") }}">Courses</a></li>
+            <li><a href="{{ url_for("predictions") }}">Predictions</a></li>
+            <li class="divider-vertical"></li>
+            <li><a href="{{ url_for("uploads") }}">Uploads</a></li>
+          </ul>
+        </div><!-- /.navbar-collapse -->
+      </div>
+    </header>
 
     <div class="container page">
       <div class="content col-lg-12">
@@ -74,8 +79,13 @@
 
     </div>
 
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script src="{{ url_for("static", filename = "bootstrap/dist/js/bootstrap.js") }}"></script>
+    <script>
+      $('.nav a:contains
+
+    </script>
     {% block js_footer %}
-      <script src="{{ url_for("static", filename = "bootstrap/dist/js/bootstrap.js") }}"></script>
     {% endblock %}
   </body>
 </html>
