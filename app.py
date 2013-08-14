@@ -14,7 +14,7 @@ import parser
 
 APP = Flask(__name__)
 # Keep passwords and credentials in a .creds file
-try:
+if os.path.exists(".creds"):
   CREDS = json.load(open(".creds"))
 
   APP.config.update(
@@ -23,8 +23,6 @@ try:
 
   APP.config["SECRET_KEY"] = "\xc62{{x.\xf6\xe1_K\xf3\x85)~\xb3E\xce)\x89j\x823|'"
   APP.config["UPLOAD_FOLDER"] = os.path.join(APP.root_path, "raw_data")
-except NameError:
-  pass
 
 #----------------------------------------
 # database
@@ -33,7 +31,7 @@ except NameError:
 from mongoengine import connect
 from flask.ext.mongoengine import MongoEngine
 
-try:
+if os.path.exists(".creds"):
   APP.config["MONGODB_DB"] = CREDS['DB_NAME']
   connect(CREDS['DB_NAME'],
       host='mongodb://' +
@@ -43,8 +41,6 @@ try:
       '@' +
       CREDS['DB_HOST_ADDRESS'])
   DB = MongoEngine(APP)
-except NameError:
-  pass
 
 #----------------------------------------
 # controllers
