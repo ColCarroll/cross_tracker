@@ -6,7 +6,7 @@ from flask import Flask, render_template, send_from_directory
 from flask import request, redirect, url_for
 from werkzeug import secure_filename
 
-import parser
+from parser import allowed_file, Parser
 
 #----------------------------------------
 # initialization
@@ -21,7 +21,6 @@ if os.path.exists(".creds"):
       DEBUG = True,
   )
 
-  APP.config["SECRET_KEY"] = "\xc62{{x.\xf6\xe1_K\xf3\x85)~\xb3E\xce)\x89j\x823|'"
   APP.config["UPLOAD_FOLDER"] = os.path.join(APP.root_path, "raw_data")
 
 #----------------------------------------
@@ -77,11 +76,15 @@ def uploads():
   """
   if request.method == "POST":
     results = request.files['results']
-    if results and parser.allowed_file(results.filename):
+    if results and allowed_file(results.filename):
       filename = secure_filename(results.filename)
-      results.save(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
-      print request.form
-      return redirect(url_for('uploaded_results', filename = filename))
+      parser = Parser(buff = results)
+    elif 'url' in request.form:
+      filename = "test.txt"
+      parser = Parser(url = request.form['url'])
+    parser.write(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
+    print request.form
+    return redirect(url_for('uploaded_results', filename = filename))
   return render_template("upload.html")
 
 @APP.route("/meets")
