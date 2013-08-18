@@ -7,63 +7,98 @@
 {% block content %}
 <h1>Upload new result file</h1>
 <div class="col-lg-12">
-  <form action="" method="post" enctype="multipart/form-data">
+  <form role="form" action="" method="post" enctype="multipart/form-data">
+    <div class="col-lg-6">
+      <fieldset class="col-lg-6">
+        <div class="form-group">
+          <label for="dp">Meet Date</label>
+          <input name="date" class="form-control" type="text" id="dp" placeholder="Meet Date" readonly/>
+        </div>
+
+        <div class="form-group">
+          <label for="meetName">Meet Name</label>
+          <input id="meetName" name="meetname" class="form-control" type="text" placeholder="Meet Name"/>
+        </div>
+
+        <div class="form-group">
+          <label for="courseName">Meet Name</label>
+          <input id="courseName" name="course" class="form-control" type="text" placeholder="Course Name"/>
+        </div>
+
+        <div class="form-group">
+          <label for="distance">Course Distance</label>
+          <input name="distance" class="form-control" type="text" placeholder="Course Distance"/>
+        </div>
+
+      </fieldset>
+    </div>
 
     <div class="col-lg-6">
-      <div class="input-group">
-        <input name="date" class="form-control" type="text" id="dp" placeholder="Meet Date" readonly/>
-      </div>
-    </div>
-    <div class="col-lg-6">
-      <div class="input-group">
-        <input name="course" class="form-control" type="text" placeholder="Course Name"/>
-      </div>
-    </div>
-    <div class="col-lg-6">
-      <div class="input-group">
-        <input name="zip" class="form-control" type="text" placeholder="Course Zip"/>
-      </div>
-    </div>
-    <div class="col-lg-6">
-      <div class="input-group">
-        <input name="distance" class="form-control" type="text" placeholder="Course Distance"/>
-      </div>
-    </div>
-    <div class="col-lg-6">
-      <div class="input-group">
-        <input name="url" class="form-control" type="url" placeholder="Result Url"/>
-      </div>
-    </div>
+      <fieldset class="col-lg-6">
 
-    <div class="fileupload fileupload-new" data-provides="fileupload">
-      <div class="input-append">
-        <div class="col-lg-3">
-          <div class="form-control">
-            <i class="icon-file fileupload-exists"></i>
-            <span class="fileupload-preview"></span>
+        <div class="form-group">
+          <input name="url" class="form-control" type="url" placeholder="Result Url"/>
+        </div>
+
+        <div class="form-group">
+          <div class="fileupload fileupload-new" data-provides="fileupload">
+            <div class="input-group">
+              <div class="form-control uneditable-input">
+                <i class="icon-file fileupload-exists"></i>
+                <span class="fileupload-preview"></span>
+              </div>
+              <div class="input-group-btn">
+                <a class="btn btn-default btn-file">
+                  <span class="fileupload-new">Select file</span>
+                  <span class="fileupload-exists">Change</span>
+                  <input name="results" type="file" class="file-input"/>
+                </a>
+              </div>
+              <a href="#" class="btn fileupload-exists" data-dismiss="fileupload">Remove</a>
+            </div>
+              <button type="submit" class="btn fileupload-exists btn-primary">Upload</button>
           </div>
         </div>
-        <span class="btn btn-file btn-primary">
-          <span class="fileupload-new">Select file</span>
-          <span class="fileupload-exists">Change</span>
-          <input name="results" type="file"/>
-        </span>
-        <a href="#" class="btn fileupload-exists" data-dismiss="fileupload">Remove</a>
-      </div>
-
-      <br>
-
-      <div class="col-lg-3">
-        <button type="submit" class="btn btn-primary">Upload</button>
-      </div>
+      </fieldset>
     </div>
   </form>
+</div>
+<!-- Bootstrap trigger to open modal -->
+<div class="col-lg-3">
+  <a data-toggle="modal" href="#rating-modal">Write a Review</a>
+   
+  <div class="hide fade modal" id="rating-modal">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal">×</button>
+      <h2>Your Review</h2>
+    </div>
+   
+    <div class="modal-body">
+      <!-- The async form to send and replace the modals content with its response -->
+      <form class="form-horizontal well" data-async data-target="#rating-modal" action="/" method="POST">
+        <fieldset>
+          <!-- form content -->
+          <div class="input-group">
+            <input name="date" class="form-control" type="text" id="dp" placeholder="Meet Date" readonly/>
+          </div>
+          <div class="input-group">
+            <input name="course" class="form-control" type="text" placeholder="Course Name"/>
+          </div>
+        </fieldset>
+      </form>
+    </div>
+   
+    <div class="modal-footer">
+      <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+    </div>
+  </div>
 </div>
 {% endblock %}
 
 {% block js_footer %}
 <script src="{{ url_for("static", filename = "js/bootstrap-fileupload.js") }}"></script>
 <script src="{{ url_for("static", filename = "js/bootstrap-datepicker.js") }}"></script>
+<script src="{{ url_for("static", filename = "js/customjs.js") }}"></script>
 <script>
   $(document).ready(function() {
     $('#dp').datepicker({
