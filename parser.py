@@ -8,6 +8,12 @@ from bs4 import BeautifulSoup
 
 ALLOWED_EXTENSIONS = set(["txt"])
 
+def find_all(regex, string):
+  """Returns index of all substrings matching the 
+  given regex
+  """
+  return [m.start() for m in re.finditer(regex, string)]
+
 def allowed_file(filename):
   """Makes sure file is in the allowed list
   """
@@ -77,6 +83,7 @@ class Parser:
   """Handles file parsing operations
   """
   def __init__(self,
+      meetname,
       date,
       buff = None,
       url = "http://www.coolrunning.com/results/12/ma/Nov3_ECACDi_set1.shtml"):
@@ -98,11 +105,11 @@ class Parser:
             line in self.data_lines]
 
     self.clean()
-    self.hier_lines = [self.hier_parse(line) for line in self.data_lines]
     self.frequencies = self.get_frequencies()
     self.class_words = self.get_class_words()
     self.class_index = self.get_class_index()
-    self.results = [Result(line) for line in self.data_lines]
+    self.hier_lines = [self.hier_parse(line) for line in self.data_lines]
+    self.results = [Result(line, meetname, date) for line in self.data_lines]
     self.set_results()
 
   def set_results(self):
@@ -111,7 +118,7 @@ class Parser:
     for result in self.results:
       result_line = result.data['raw_data']
       result.set_time(self.num_parser.return_time(result_line))
-      result.set_class(self.get_class(result_line))
+      result.set_class(self.get_class(result_line)['year'])
 
   def write(self, path):
     """Writes data back out
@@ -143,14 +150,22 @@ class Parser:
   
   def hier_parse(self, line):
     """Performs some heirarchical clustering on the strings in 
-    the results, first splitting by time fields (and removing them),
-    then splitting by 2+ whitespaces, then by single white spaces.
+    the results, first splitting by class field (if existe) and 
+    time fields, then splitting by 2+ whitespaces, then by 
+    single white spaces.
     """
-    splt = [field for field in self.num_parser.split_on_times(line) if
-        len(field.strip()) > 0]
+    splitfields = [field[1].string for
+        field in self.num_parser.get_timefields(line)]
+    splt = self.class_split(line)
+    splt = reduce(lambda x, y:x+y, [re.split("|".join([field for field in 
+      splitfields if field]), line) 
+        for line in splt])
     splt = [re.split(r"\s{2,}", field.strip()) for
         field in splt if len(field) > 0]
-    return[[j.split() for j in field] for field in splt if len(field) > 0]
+    splt = [j.split() for field in splt for j in field if len(field) > 0]
+    strings = [[word for word in field if
+      re.match("[a-z'. ()-]+$",word)] for field in splt]
+    return [string for string in strings if len(string)>0]
 
   def get_frequencies(self):
     """Returns frequency counts of all words in the results
@@ -197,18 +212,26 @@ class Parser:
     """
     if self.class_index:
       for class_word, class_year in self.class_words.iteritems():
-        if class_word in line and line.index(class_word) == self.class_index:
-          return class_year
-    return None
+        if self.class_index in find_all(class_word, line):
+          return {
+              'word': class_word,
+              'year': class_year,
+              'index': self.class_index}
+    return {'word': None, 'year': None, 'index': None}
 
-
-
-    
+  def class_split(self, line):
+    """ Splits a line by the class year, if exists.  Returns
+    a list
+    """
+    class_info = self.get_class(line)
+    if class_info['word']:
+      return [line[:class_info['index']],
+          line[class_info['index']+len(class_info['word']):]]
 
 class Result:
   """ Handles individual runners in a result
   """
-  def __init__(self, data):
+  def __init__(self, data, meetname, date):
     self.data = {
         "raw_data": data,
         "time": None,
@@ -216,7 +239,8 @@ class Result:
         "school": None,
         "firstname": None,
         "lastname": None,
-        "meetname": None,}
+        "meetname": meetname,
+        "date": date,}
 
   def set_time(self, time):
     """ Set finishing time
@@ -264,6 +288,7 @@ def startup():
   """Convenience function to have some initial data
   """
   return Parser(
+      meetname = "ECAC Championship",
       date = datetime.date(2012, 11, 3),
       url = 'http://www.coolrunning.com/results/12/ma/Nov3_ECACDi_set1.shtml')
 
