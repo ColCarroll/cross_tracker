@@ -7,66 +7,44 @@
 {% endblock %}
 {% block content %}
 <h1>Upload new result file</h1>
-<div class="col-lg-12">
   <form role="form" action="" method="post" enctype="multipart/form-data">
-    <div>
-      <fieldset class="col-lg-6">
-        {{ render_field(form.date) }}
-        {{ render_field(form.meetname) }}
-        {{ render_field(form.course) }}
-        {{ render_field(form.distance) }}
-      </fieldset>
-    </div>
+      <div class="row">
+        <fieldset class="col-lg-6">
+          {{ render_field(form.date) }}
+          {{ render_field(form.meetname) }}
+          {{ render_field(form.course) }}
+          {{ render_field(form.distance) }}
+        </fieldset>
 
-    <div>
-      <fieldset class="col-lg-6">
+        <fieldset class="col-lg-6 resultfields">
 
-        <div class="form-group">
-          <div class="fileupload fileupload-new" data-provides="fileupload">
-          {{ render_field(form.url, disabled=True) }}
-          {{ form.file_data.label }}
-            <div class="input-group">
-              <div class="form-control uneditable-input">
-                <i class="icon-file fileupload-exists"></i>
-                <span class="fileupload-preview"></span>
+          <div class="form-group">
+            <div class="fileupload fileupload-new" data-provides="fileupload">
+            {{ render_field(form.url, class="form-control resultfield") }}
+            {{ form.file_data.label }}
+              <div class="input-group">
+                <div class="form-control uneditable-input resultfield">
+                  <i class="icon-file fileupload-exists"></i>
+                  <span class="fileupload-preview"></span>
+                </div>
+                <div class="input-group-btn">
+                  <a class="btn btn-primary btn-file resultfield">
+                    <span class="fileupload-new">Select file</span>
+                    <span class="fileupload-exists">Change</span>
+                    {{ form.file_data(class="file-input") }}
+                  </a>
+                </div>
+                <a href="#" class="btn fileupload-exists" data-dismiss="fileupload">Remove</a>
               </div>
-              <div class="input-group-btn">
-                <a class="btn btn-default btn-file">
-                  <span class="fileupload-new">Select file</span>
-                  <span class="fileupload-exists">Change</span>
-                  {{ form.file_data(class="file-input") }}
-                </a>
-              </div>
-              <a href="#" class="btn fileupload-exists" data-dismiss="fileupload">Remove</a>
             </div>
-            <button type="submit" class="btn btn-block fileupload-exists btn-primary">Upload</button>
           </div>
-        </div>
-      </fieldset>
+
+        </fieldset>
+      </div>
+    <div class="row">
+      <button type="submit" class="btn btn-primary" disabled>Upload</button>
     </div>
   </form>
-</div>
-<!-- Button trigger modal -->
-  <a data-toggle="modal" href="#myModal" class="btn btn-primary btn-large">Launch demo modal</a>
-
-  <!-- Modal -->
-  <div class="modal" id="myModal">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-          <h4 class="modal-title">Modal title</h4>
-        </div>
-        <div class="modal-body">
-          ...
-        </div>
-        <div class="modal-footer">
-          <a href="" data-dismiss="modal" class="btn">Close</a>
-          <a href="#" class="btn btn-primary">Save changes</a>
-        </div>
-      </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-  </div><!-- /.modal -->
 {% endblock %}
 
 {% block js_footer %}
