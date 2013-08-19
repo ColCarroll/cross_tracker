@@ -103,6 +103,7 @@
 .control-group.warning .fileupload .uneditable-input {
   color: #a47e3c;
   border-color: #a47e3c;
+  box-sizing: border-box;
 }
 .control-group.warning .fileupload .fileupload-preview {
   color: #a47e3c;

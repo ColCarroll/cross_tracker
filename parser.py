@@ -7,18 +7,17 @@ from collections import Counter
 from bs4 import BeautifulSoup
 
 ALLOWED_EXTENSIONS = set(["txt"])
-
-def find_all(regex, string):
-  """Returns index of all substrings matching the 
-  given regex
-  """
-  return [m.start() for m in re.finditer(regex, string)]
-
 def allowed_file(filename):
   """Makes sure file is in the allowed list
   """
   return (("." in filename) and
       (filename.rsplit(".",1)[1] in ALLOWED_EXTENSIONS))
+
+def find_all(regex, string):
+  """Returns index of all substrings matching the
+  given regex
+  """
+  return [m.start() for m in re.finditer(regex, string)]
 
 class NumParser:
   """Helper class to parse time and place fields
@@ -89,9 +88,10 @@ class Parser:
       url = "http://www.coolrunning.com/results/12/ma/Nov3_ECACDi_set1.shtml"):
 
     self.num_parser = NumParser()
-    self.date = date
+    self.date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
     if buff:
       self.raw_data = buff.read()
+      self.data_lines = self.raw_data.split("\n")
     elif url:
       data = requests.get(url).text
       soup = BeautifulSoup(data)
@@ -147,18 +147,18 @@ class Parser:
       elif not beginning_found:
         counter = 1
     self.data_lines = good_lines
-  
+
   def hier_parse(self, line):
-    """Performs some heirarchical clustering on the strings in 
-    the results, first splitting by class field (if existe) and 
-    time fields, then splitting by 2+ whitespaces, then by 
+    """Performs some heirarchical clustering on the strings in
+    the results, first splitting by class field (if existe) and
+    time fields, then splitting by 2+ whitespaces, then by
     single white spaces.
     """
     splitfields = [field[1].string for
         field in self.num_parser.get_timefields(line)]
     splt = self.class_split(line)
-    splt = reduce(lambda x, y:x+y, [re.split("|".join([field for field in 
-      splitfields if field]), line) 
+    splt = reduce(lambda x, y:x+y, [re.split("|".join([field for field in
+      splitfields if field]), line)
         for line in splt])
     splt = [re.split(r"\s{2,}", field.strip()) for
         field in splt if len(field) > 0]
@@ -206,7 +206,7 @@ class Parser:
     if most_common[1]/float(sum(counts.values())) > 0.5:
       return most_common[0]
     return None
-  
+
   def get_class(self, line):
     """ Sets the class year of a result
     """

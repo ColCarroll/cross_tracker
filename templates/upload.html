@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "helpers.html" import render_field %}
 {% block title %} - Home{% endblock %}
 {% block css_header %}
 <link href="{{ url_for("static", filename = "css/bootstrap-fileupload.css") }}" rel="stylesheet">
@@ -8,40 +9,22 @@
 <h1>Upload new result file</h1>
 <div class="col-lg-12">
   <form role="form" action="" method="post" enctype="multipart/form-data">
-    <div class="col-lg-6">
+    <div>
       <fieldset class="col-lg-6">
-        <div class="form-group">
-          <label for="dp">Meet Date</label>
-          <input name="date" class="form-control" type="text" id="dp" placeholder="Meet Date" readonly/>
-        </div>
-
-        <div class="form-group">
-          <label for="meetName">Meet Name</label>
-          <input id="meetName" name="meetname" class="form-control" type="text" placeholder="Meet Name"/>
-        </div>
-
-        <div class="form-group">
-          <label for="courseName">Meet Name</label>
-          <input id="courseName" name="course" class="form-control" type="text" placeholder="Course Name"/>
-        </div>
-
-        <div class="form-group">
-          <label for="distance">Course Distance</label>
-          <input name="distance" class="form-control" type="text" placeholder="Course Distance"/>
-        </div>
-
+        {{ render_field(form.date) }}
+        {{ render_field(form.meetname) }}
+        {{ render_field(form.course) }}
+        {{ render_field(form.distance) }}
       </fieldset>
     </div>
 
-    <div class="col-lg-6">
+    <div>
       <fieldset class="col-lg-6">
 
         <div class="form-group">
-          <input name="url" class="form-control" type="url" placeholder="Result Url"/>
-        </div>
-
-        <div class="form-group">
           <div class="fileupload fileupload-new" data-provides="fileupload">
+          {{ render_field(form.url, disabled=True) }}
+          {{ form.file_data.label }}
             <div class="input-group">
               <div class="form-control uneditable-input">
                 <i class="icon-file fileupload-exists"></i>
@@ -51,48 +34,39 @@
                 <a class="btn btn-default btn-file">
                   <span class="fileupload-new">Select file</span>
                   <span class="fileupload-exists">Change</span>
-                  <input name="results" type="file" class="file-input"/>
+                  {{ form.file_data(class="file-input") }}
                 </a>
               </div>
               <a href="#" class="btn fileupload-exists" data-dismiss="fileupload">Remove</a>
             </div>
-              <button type="submit" class="btn fileupload-exists btn-primary">Upload</button>
+            <button type="submit" class="btn btn-block fileupload-exists btn-primary">Upload</button>
           </div>
         </div>
       </fieldset>
     </div>
   </form>
 </div>
-<!-- Bootstrap trigger to open modal -->
-<div class="col-lg-3">
-  <a data-toggle="modal" href="#rating-modal">Write a Review</a>
-   
-  <div class="hide fade modal" id="rating-modal">
-    <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal">×</button>
-      <h2>Your Review</h2>
-    </div>
-   
-    <div class="modal-body">
-      <!-- The async form to send and replace the modals content with its response -->
-      <form class="form-horizontal well" data-async data-target="#rating-modal" action="/" method="POST">
-        <fieldset>
-          <!-- form content -->
-          <div class="input-group">
-            <input name="date" class="form-control" type="text" id="dp" placeholder="Meet Date" readonly/>
-          </div>
-          <div class="input-group">
-            <input name="course" class="form-control" type="text" placeholder="Course Name"/>
-          </div>
-        </fieldset>
-      </form>
-    </div>
-   
-    <div class="modal-footer">
-      <a href="#" class="btn" data-dismiss="modal">Cancel</a>
-    </div>
-  </div>
-</div>
+<!-- Button trigger modal -->
+  <a data-toggle="modal" href="#myModal" class="btn btn-primary btn-large">Launch demo modal</a>
+
+  <!-- Modal -->
+  <div class="modal" id="myModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title">Modal title</h4>
+        </div>
+        <div class="modal-body">
+          ...
+        </div>
+        <div class="modal-footer">
+          <a href="" data-dismiss="modal" class="btn">Close</a>
+          <a href="#" class="btn btn-primary">Save changes</a>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
 {% endblock %}
 
 {% block js_footer %}
@@ -104,7 +78,6 @@
     $('#dp').datepicker({
       "format": "yyyy-mm-dd",
       "endDate": new Date(),
-      "todayBtn": true,
       "autoclose": true,
     });
   });

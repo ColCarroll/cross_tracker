@@ -6,6 +6,7 @@ from flask import Flask, render_template, send_from_directory
 from flask import request, redirect, url_for
 from werkzeug import secure_filename
 
+import forms
 from parser import allowed_file, Parser
 
 #----------------------------------------
@@ -74,18 +75,24 @@ def index():
 def uploads():
   """ Handles file uploads
   """
-  if request.method == "POST":
+  form = forms.UploadForm(request.form)
+  if request.method == "POST" and form.validate():
     results = request.files['results']
     if results and allowed_file(results.filename):
       filename = secure_filename(results.filename)
-      parser = Parser(buff = results)
+      parser = Parser(
+          meetname = form.meetname.data,
+          date = form.date.data,
+          buff = results)
     elif 'url' in request.form:
       filename = "test.txt"
-      parser = Parser(url = request.form['url'])
+      parser = Parser(
+          meetname = form.meetname.data,
+          date = form.date.data,
+          url = form.url.data)
     parser.write(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
-    print request.form
     return redirect(url_for('uploaded_results', filename = filename))
-  return render_template("upload.html")
+  return render_template("upload.html", form=form)
 
 @APP.route("/meets")
 def meets():
