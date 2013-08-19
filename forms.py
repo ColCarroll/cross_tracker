@@ -1,7 +1,7 @@
 """Classes for forms
 """
 from wtforms import Form, TextField, FileField, DateField
-from wtforms import FormField, validators
+from wtforms import validators
 
 class RequiredIfNot(validators.Required):
   """A validator which makes a field required if
@@ -16,10 +16,6 @@ class RequiredIfNot(validators.Required):
     if other_field is None and not field.data:
       raise Exception('Required if "%s" is missing' % self.other_field_name)
 
-class ResultForm(Form):
-  """Subclass the results
-  """
-
 class UploadForm(Form):
   """ Upload new results
   """
@@ -27,9 +23,5 @@ class UploadForm(Form):
   meetname = TextField('Meet Name')
   course = TextField('Course Name')
   distance = TextField('Course Distance')
-  result_data = FormField(ResultForm, [validators.required()])
-  url = TextField('Result URL', [RequiredIfNot('file_data'), validators.URL()])
-  file_data = FileField('Upload file',
-      [validators.regexp(r'^[^/\\]\.txt',
-        message="Must be a text file"),
-        RequiredIfNot('url')])
+  url = TextField('Result URL')
+  file_data = FileField('Upload file')

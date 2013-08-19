@@ -2,6 +2,7 @@
 """
 import os
 import json
+import logging
 from flask import Flask, render_template, send_from_directory
 from flask import request, redirect, url_for
 from werkzeug import secure_filename
@@ -14,6 +15,7 @@ from parser import allowed_file, Parser
 #----------------------------------------
 
 APP = Flask(__name__)
+APP.logger.setLevel(logging.INFO)
 # Keep passwords and credentials in a .creds file
 if os.path.exists(".creds"):
   CREDS = json.load(open(".creds"))
@@ -76,15 +78,17 @@ def uploads():
   """ Handles file uploads
   """
   form = forms.UploadForm(request.form)
+  APP.logger.info(form.data)
+  APP.logger.info(request.files)
   if request.method == "POST" and form.validate():
-    results = request.files['results']
+    results = request.files['file_data']
     if results and allowed_file(results.filename):
       filename = secure_filename(results.filename)
       parser = Parser(
           meetname = form.meetname.data,
           date = form.date.data,
           buff = results)
-    elif 'url' in request.form:
+    elif 'url' in form:
       filename = "test.txt"
       parser = Parser(
           meetname = form.meetname.data,

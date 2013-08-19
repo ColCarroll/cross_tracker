@@ -88,7 +88,7 @@ class Parser:
       url = "http://www.coolrunning.com/results/12/ma/Nov3_ECACDi_set1.shtml"):
 
     self.num_parser = NumParser()
-    self.date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
+    self.date = date
     if buff:
       self.raw_data = buff.read()
       self.data_lines = self.raw_data.split("\n")
@@ -202,8 +202,8 @@ class Parser:
           counts[line.index(word)] += 1
         except ValueError:
           pass
-    most_common = counts.most_common()[0]
-    if most_common[1]/float(sum(counts.values())) > 0.5:
+    most_common = counts.most_common()
+    if most_common and most_common[0][1]/float(sum(counts.values())) > 0.5:
       return most_common[0]
     return None
 
@@ -227,6 +227,7 @@ class Parser:
     if class_info['word']:
       return [line[:class_info['index']],
           line[class_info['index']+len(class_info['word']):]]
+    return [line]
 
 class Result:
   """ Handles individual runners in a result
