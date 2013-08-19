@@ -119,12 +119,15 @@ class Parser:
       result_line = result.data['raw_data']
       result.set_time(self.num_parser.return_time(result_line))
       result.set_class(self.get_class(result_line)['year'])
+      textfields = self.find_name(result_line)
+      result.set_name(textfields["firstname"], textfields["lastname"])
+      result.set_school(textfields["team"])
 
   def write(self, path):
     """Writes data back out
     """
     with open(path, 'wb') as buff:
-      buff.write("\n".join(self.data_lines))
+      buff.write("\n".join(str(result) for result in self.results))
 
   def clean(self):
     """Removes empty lines, and any headers/footers
@@ -164,8 +167,35 @@ class Parser:
         field in splt if len(field) > 0]
     splt = [j.split() for field in splt for j in field if len(field) > 0]
     strings = [[word for word in field if
-      re.match("[a-z'. ()-]+$",word)] for field in splt]
+      re.match("[a-z',-. ()-]+$",word)] for field in splt]
     return [string for string in strings if len(string)>0]
+
+  def find_name(self, line):
+    """Returns a firstname, lastname, team tuple for a line
+    """
+    name_index = self.find_name_index()
+    hier = self.hier_parse(line)
+    return {"firstname": hier[name_index][0],
+        "lastname": " ".join(hier[name_index][1:]),
+        "team": " ".join(hier[1])}
+
+  def find_name_index(self):
+    """Looks for a person's name by looking for the
+    hierarchical field that is usually length 2
+    """
+    fieldscores = {0:Counter(), 1:Counter()}
+    for field in self.hier_lines:
+      for j, strlist in enumerate(field):
+        fieldscores[j][len(strlist)] += 1
+    name_perc = 0
+    name_index = 0
+    for j in fieldscores:
+      new_perc = fieldscores[j][2]/float(sum(fieldscores[j].values()))
+      if new_perc > name_perc:
+        name_perc = new_perc
+        name_index = j
+    return name_index
+
 
   def get_frequencies(self):
     """Returns frequency counts of all words in the results
@@ -212,11 +242,11 @@ class Parser:
     """
     if self.class_index:
       for class_word, class_year in self.class_words.iteritems():
-        if self.class_index in find_all(class_word, line):
+        if self.class_index[0] in find_all(class_word, line):
           return {
               'word': class_word,
               'year': class_year,
-              'index': self.class_index}
+              'index': self.class_index[0]}
     return {'word': None, 'year': None, 'index': None}
 
   def class_split(self, line):
@@ -269,7 +299,7 @@ class Result:
     """
     self.data['meetname'] = meet
 
-  def __str__(self):
+  def __repr__(self):
     string = "Result:"
     for key, value in self.data.iteritems():
       if value:
