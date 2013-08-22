@@ -7,8 +7,10 @@ from flask import Flask, render_template, send_from_directory
 from flask import request, redirect, url_for
 from werkzeug import secure_filename
 
+import mongo_utilities
 import forms
 from parser import allowed_file, Parser
+
 
 #----------------------------------------
 # initialization
@@ -25,25 +27,6 @@ if os.path.exists(".creds"):
   )
 
   APP.config["UPLOAD_FOLDER"] = os.path.join(APP.root_path, "raw_data")
-
-#----------------------------------------
-# database
-#----------------------------------------
-
-from mongoengine import connect
-from flask.ext.mongoengine import MongoEngine
-
-if os.path.exists(".creds"):
-  APP.config["MONGODB_DB"] = CREDS['DB_NAME']
-  connect(CREDS['DB_NAME'],
-      host='mongodb://' +
-      CREDS['DB_USERNAME'] +
-      ':' +
-      CREDS['DB_PASSWORD'] +
-      '@' +
-      CREDS['DB_HOST_ADDRESS'])
-  DB = MongoEngine(APP)
-
 #----------------------------------------
 # controllers
 #----------------------------------------
@@ -106,9 +89,22 @@ def meets():
 
 @APP.route("/teams")
 def teams():
-  """Front page for app
+  """View team data
   """
-  return render_template('index.html')
+  return render_template('teams.html', teams = mongo_utilities.get_teams())
+
+@APP.route("/teams/new", methods = ["GET", "POST"])
+def add_team():
+  """ Add a new team
+  """
+  team_name = request.form['team_name']
+
+  APP.logger.info("There was a post!")
+  APP.logger.info(request.form)
+  if request.method == "POST":
+    mongo_utilities.create_team(team_name)
+  else:
+    return render_template('teams.html', teams = mongo_utilities.get_teams())
 
 @APP.route("/courses")
 def courses():

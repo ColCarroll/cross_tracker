@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %} - Teams{% endblock %}
+
+{% macro display_teams(teams) %}
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Team</th>
+    </tr>
+  </thead>
+  {% for team in teams %}
+  <tr>
+    <td>{{ team['name'] }} </td>
+  </tr>
+  {% endfor %}
+</table>
+{% endmacro %}
+
+{% block content %}
+<a href="#teamModal" role="button" class="btn btn-primary" data-toggle="modal">Add a team</a>
+
+<div id="teamModal" class="modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3>Add a team</h3>
+      </div>
+      <div class="modal-body">
+        <form id="teamForm" method="post">
+          <input type="text" placeholder= "Team Name" id="team_name">
+          <button class="btn btn-primary" id="teamFormSubmit" type="submit" data-dismiss="modal">Submit</button>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+{{ display_teams(teams) }}
+{% endblock %}
+
+{% block js_footer %}
+<script>
+$(function(){
+    $('#teamFormSubmit').click(function(e){
+      e.preventDefault();
+    $.post("{{ url_for("add_team") }}", {"team_name": $('#team_name').val()});
+    document.getElementById("teamForm").reset();
+    });
+});
+</script>
+{% endblock %}
