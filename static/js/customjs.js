@@ -33,9 +33,9 @@ function disable_other(elem) {
 $(document).ready(function () {
   $(".resultfields").find(".resultfield").each(function () {
     var elem = $(this);
-    disable_other(elem);
-    elem.on("propertychange keyup input paste change click", function (event) {
-      disable_other(elem);
+# disable_other(elem);
+    elem.on("propertychange keyup input paste change", function (event) {
+#     disable_other(elem);
     });
   });
 });

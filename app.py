@@ -26,7 +26,8 @@ if os.path.exists(".creds"):
       DEBUG = True,
   )
 
-  APP.config["UPLOAD_FOLDER"] = os.path.join(APP.root_path, "raw_data")
+APP.config["UPLOAD_FOLDER"] = os.path.join(APP.root_path, "raw_data")
+APP.logger.info(APP.config["UPLOAD_FOLDER"])
 #----------------------------------------
 # controllers
 #----------------------------------------
@@ -81,15 +82,9 @@ def uploads():
     return redirect(url_for('uploaded_results', filename = filename))
   return render_template("upload.html", form=form)
 
-@APP.route("/meets")
-def meets():
-  """Front page for app
-  """
-  return render_template('index.html')
-
 @APP.route("/teams")
 def teams():
-  """View team data
+  """Team index page
   """
   return render_template('teams.html', teams = mongo_utilities.get_teams())
 
@@ -106,11 +101,25 @@ def add_team():
   else:
     return render_template('teams.html', teams = mongo_utilities.get_teams())
 
+@APP.route("/meets")
+def meets():
+  """Meet index page
+  """
+  return render_template('meets.html', meets = mongo_utilities.get_meets())
+
+@APP.route("/meets/<meet_id>")
+def results(meet_id):
+  """Print meet results
+  """
+  return render_template('results.html',
+      results = mongo_utilities.get_meet_results(meet_id))
+
 @APP.route("/courses")
 def courses():
-  """Front page for app
+  """Course index page
   """
-  return render_template('index.html')
+  return render_template('courses.html',
+      courses = mongo_utilities.get_courses())
 
 @APP.route("/predictions")
 def predictions():

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %} - Meets{% endblock %}
+
+{% macro display_meets(meets) %}
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Meets</th>
+    </tr>
+  </thead>
+  {% for meet in meets %}
+  <tr>
+    <td><a href="{{ url_for('results', meet_id=meet['_id']) }}">{{ meet['name'] }}</a></td>
+    <td>{{ meet['date'].strftime("%d %b %Y") }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endmacro %}
+
+{% block content %}
+<a href="{{ url_for('uploads') }}" role="button" class="btn btn-primary">Upload Results</a>
+{{ display_meets(meets) }}
+{% endblock %}

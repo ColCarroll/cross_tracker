@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %} - Courses{% endblock %}
+
+{% macro display_courses(courses) %}
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Course</th>
+    </tr>
+  </thead>
+  {% for course in courses %}
+  <tr>
+    <td>{{ course['name'] }} </td>
+    <td> <a href="#editCourse" role="button" class="btn btn-primary" data-toggle="modal">Edit</a>
+  </tr>
+  {% endfor %}
+</table>
+{% endmacro %}
+
+{% block content %}
+{{ display_courses(courses) }}
+{% endblock %}
+

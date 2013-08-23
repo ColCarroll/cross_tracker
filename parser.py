@@ -5,6 +5,7 @@ import re
 import requests
 from collections import Counter
 from bs4 import BeautifulSoup
+import mongo_utilities
 
 ALLOWED_EXTENSIONS = set(["txt"])
 def allowed_file(filename):
@@ -109,8 +110,10 @@ class Parser:
     self.class_words = self.get_class_words()
     self.class_index = self.get_class_index()
     self.hier_lines = [self.hier_parse(line) for line in self.data_lines]
-    self.results = [Result(line, meetname, date) for line in self.data_lines]
+    meetid = str(mongo_utilities.create_meet(meetname, date = date))
+    self.results = [Result(line, meetid, date) for line in self.data_lines]
     self.set_results()
+    self.save()
 
   def set_results(self):
     """Sets properties of the result objects
@@ -121,13 +124,19 @@ class Parser:
       result.set_class(self.get_class(result_line)['year'])
       textfields = self.find_name(result_line)
       result.set_name(textfields["firstname"], textfields["lastname"])
-      result.set_school(textfields["team"])
+      result.set_team(textfields["team"])
 
   def write(self, path):
     """Writes data back out
     """
     with open(path, 'wb') as buff:
       buff.write("\n".join(str(result) for result in self.results))
+
+  def save(self):
+    """Saves data to mongo database
+    """
+    for result in self.results:
+      mongo_utilities.add_result(**result.data)
 
   def clean(self):
     """Removes empty lines, and any headers/footers
@@ -262,15 +271,15 @@ class Parser:
 class Result:
   """ Handles individual runners in a result
   """
-  def __init__(self, data, meetname, date):
+  def __init__(self, data, meetid, date):
     self.data = {
         "raw_data": data,
         "time": None,
         "class": None,
-        "school": None,
+        "team": None,
         "firstname": None,
         "lastname": None,
-        "meetname": meetname,
+        "meetid": meetid,
         "date": date,}
 
   def set_time(self, time):
@@ -278,10 +287,10 @@ class Result:
     """
     self.data['time'] = time
 
-  def set_school(self, school):
-    """ Set school
+  def set_team(self, team):
+    """ Set team
     """
-    self.data['school'] = school
+    self.data['team'] = team
 
   def set_name(self, firstname, lastname):
     """ Set name
@@ -294,10 +303,10 @@ class Result:
     """
     self.data['class'] = classyear
 
-  def set_meet(self, meet):
+  def set_meet(self, meetid):
     """ Set meet
     """
-    self.data['meetname'] = meet
+    self.data['meetid'] = meetid
 
   def __repr__(self):
     string = "Result:"
@@ -321,7 +330,7 @@ def startup():
   return Parser(
       meetname = "ECAC Championship",
       date = datetime.date(2012, 11, 3),
-      url = 'http://www.coolrunning.com/results/12/ma/Nov3_ECACDi_set1.shtml')
+      buff = open("/Users/colinc/Documents/XCdata/results/ecac2012.txt"))
 
 if __name__ == "__main__":
   parser = startup()

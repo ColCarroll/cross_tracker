@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %} - Results{% endblock %}
+
+{% macro display_results(results) %}
+<p>
+{{ len(results) }}
+</p>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Result</th>
+    </tr>
+  </thead>
+  {% for result in results %}
+  <tr>
+    <td>{{ "%s %s" % (result['firstname'], result['lastname']) }} </td>
+  </tr>
+  {% endfor %}
+</table>
+{% endmacro %}
+
+{% block content %}
+{{ display_results(results) }}
+{% endblock %}
+
