@@ -62,8 +62,6 @@ def uploads():
   """ Handles file uploads
   """
   form = forms.UploadForm(request.form)
-  APP.logger.info(form.data)
-  APP.logger.info(request.files)
   if request.method == "POST" and form.validate():
     results = request.files['file_data']
     if results and allowed_file(results.filename):
@@ -79,7 +77,7 @@ def uploads():
           date = form.date.data,
           url = form.url.data)
     parser.write(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
-    return redirect(url_for('uploaded_results', filename = filename))
+    return redirect(url_for('results', meet_id = parser.get_id()))
   return render_template("upload.html", form=form)
 
 @APP.route("/teams")
@@ -87,6 +85,15 @@ def teams():
   """Team index page
   """
   return render_template('teams.html', teams = mongo_utilities.get_teams())
+
+@APP.route("/teams/<team_id>")
+def team_info(team_id):
+  """Info for individual team
+  """
+  info = mongo_utilities.get_team_info(team_id)
+  APP.logger.info("%s", info)
+  return render_template("team_info.html",
+      info = mongo_utilities.get_team_info(team_id))
 
 @APP.route("/teams/new", methods = ["GET", "POST"])
 def add_team():
@@ -133,4 +140,4 @@ def predictions():
 
 if __name__ == "__main__":
   PORT = int(os.environ.get("PORT", 5000))
-  APP.run(host='0.0.0.0', port=PORT)
+  APP.run(host='0.0.0.0', debug=True, port=PORT)

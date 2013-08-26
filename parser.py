@@ -110,10 +110,15 @@ class Parser:
     self.class_words = self.get_class_words()
     self.class_index = self.get_class_index()
     self.hier_lines = [self.hier_parse(line) for line in self.data_lines]
-    meetid = str(mongo_utilities.create_meet(meetname, date = date))
-    self.results = [Result(line, meetid, date) for line in self.data_lines]
+    self.meet_id = mongo_utilities.create_meet(meetname, date = date)
+    self.results = [Result(line, self.meet_id, date) for line in self.data_lines]
     self.set_results()
     self.save()
+
+  def get_id(self):
+    """Returns meet_id
+    """
+    return self.meet_id
 
   def set_results(self):
     """Sets properties of the result objects
@@ -121,9 +126,12 @@ class Parser:
     for result in self.results:
       result_line = result.data['raw_data']
       result.set_time(self.num_parser.return_time(result_line))
-      result.set_class(self.get_class(result_line)['year'])
       textfields = self.find_name(result_line)
-      result.set_name(textfields["firstname"], textfields["lastname"])
+      result.set_runner(
+          textfields["firstname"],
+          textfields["lastname"],
+          textfields["team"],
+          self.get_class(result_line)['class_year'])
       result.set_team(textfields["team"])
 
   def write(self, path):
@@ -184,6 +192,11 @@ class Parser:
     """
     name_index = self.find_name_index()
     hier = self.hier_parse(line)
+    if "," in [j for j in hier[name_index]]:
+      name = " ".join(hier[name_index]).split(",")
+      return {"firstname": name[1].strip(),
+          "lastname": name[0].strip(), 
+          "team": " ".join(hier[1])}
     return {"firstname": hier[name_index][0],
         "lastname": " ".join(hier[name_index][1:]),
         "team": " ".join(hier[1])}
@@ -204,7 +217,6 @@ class Parser:
         name_perc = new_perc
         name_index = j
     return name_index
-
 
   def get_frequencies(self):
     """Returns frequency counts of all words in the results
@@ -254,9 +266,9 @@ class Parser:
         if self.class_index[0] in find_all(class_word, line):
           return {
               'word': class_word,
-              'year': class_year,
+              'class_year': class_year,
               'index': self.class_index[0]}
-    return {'word': None, 'year': None, 'index': None}
+    return {'word': None, 'class_year': None, 'index': None}
 
   def class_split(self, line):
     """ Splits a line by the class year, if exists.  Returns
@@ -271,15 +283,13 @@ class Parser:
 class Result:
   """ Handles individual runners in a result
   """
-  def __init__(self, data, meetid, date):
+  def __init__(self, data, meet_id, date):
     self.data = {
         "raw_data": data,
         "time": None,
-        "class": None,
-        "team": None,
-        "firstname": None,
-        "lastname": None,
-        "meetid": meetid,
+        "team_id": None,
+        "runner_id": None,
+        "meet_id": meet_id,
         "date": date,}
 
   def set_time(self, time):
@@ -290,23 +300,21 @@ class Result:
   def set_team(self, team):
     """ Set team
     """
-    self.data['team'] = team
+    self.data['team_id'] = mongo_utilities.create_team(team)
 
-  def set_name(self, firstname, lastname):
+  def set_runner(self, firstname, lastname, team, class_year = None):
     """ Set name
     """
-    self.data['firstname'] = firstname
-    self.data['lastname'] = lastname
+    self.data['runner_id'] = mongo_utilities.create_runner(
+        firstname,
+        lastname,
+        team,
+        class_year)
 
-  def set_class(self, classyear):
-    """ Set class
-    """
-    self.data['class'] = classyear
-
-  def set_meet(self, meetid):
+  def set_meet(self, meet_id):
     """ Set meet
     """
-    self.data['meetid'] = meetid
+    self.data['meet_id'] = meet_id
 
   def __repr__(self):
     string = "Result:"

@@ -10,7 +10,7 @@
   </thead>
   {% for team in teams %}
   <tr>
-    <td>{{ team['name'] }} </td>
+    <td>{{ team['name'].title() }} </td>
   </tr>
   {% endfor %}
 </table>

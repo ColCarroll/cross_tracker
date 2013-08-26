@@ -14,6 +14,7 @@ TEAM_COLLECTION = "teams"
 MEET_COLLECTION = "meets"
 COURSE_COLLECTION = "courses"
 RESULT_COLLECTION = "results"
+RUNNER_COLLECTION = "runners"
 
 def time_to_string(*results):
   """Checks for a time field and changes it to 
@@ -55,7 +56,7 @@ def string_to_date(*results):
 # Result utilities
 
 def add_result(**kwargs):
-  """Creates a new team
+  """Creates a new result
   """
   if 'team' in kwargs:
     create_team(kwargs['team'])
@@ -78,17 +79,58 @@ def get_results(**kwargs):
 def get_meet_results(meet_id):
   """Return results for a particular meet
   """
-  results = DB[RESULT_COLLECTION].find({'meetid': meet_id})
+  results = [r for r in DB[RESULT_COLLECTION].find({'meet_id': meet_id})]
+  runners = {r['_id']: r for r in 
+      DB[RUNNER_COLLECTION].find(
+        {'_id': {'$in':
+          [result['runner_id'] for result in results]}})}
+  teams = {t['_id']: t for t in 
+      DB[TEAM_COLLECTION].find(
+        {'_id': {'$in':
+          [result['team_id'] for result in results]}})}
   results = [r for r in results]
+  for r in results:
+    r['team'] = teams[r['team_id']]['name']
+    r['runner'] = runners[r['runner_id']]['display_name']
+    r['class'] = runners[r['runner_id']]['class_year']
   string_to_date(*results)
   return results
+
+# Runner utilities
+
+def create_runner(first_name, last_name, team, class_year):
+  """Creates a new runner
+  """
+  runner = {
+      "first_name" : first_name.title(),
+      "last_name" : last_name.title(),
+      "display_name" : "%s %s" % (first_name.title(),
+        last_name.title()),
+      "team_id" : create_team(team),
+      "class_year" : class_year
+      }
+  exists = get_runner(runner)
+  if exists:
+    return exists['_id']
+  return DB[RUNNER_COLLECTION].insert(runner)
+
+def get_runner(kwargs):
+  """Gets runner if it exists
+  """
+  return DB[RUNNER_COLLECTION].find_one(kwargs)
+
+def get_runners():
+  """Returns a list of all runners
+  """
+  return DB[RUNNER_COLLECTION].find()
+
 
 # Team utilities
 
 def create_team(team_name, **kwargs):
   """Creates a new team
   """
-  kwargs["name"] = team_name
+  kwargs["name"] = team_name.title()
   exists = get_team(team_name)
   if exists:
     return exists['_id']
@@ -98,18 +140,20 @@ def create_team(team_name, **kwargs):
 def get_team(team_name):
   """Gets team if it exists
   """
-  teams = get_teams()
-  for team in teams:
-    if team_name.lower() in team["alias"]:
-      return team
-  return {}
+  return DB[TEAM_COLLECTION].find_one({"alias": team_name.lower()})
 
 def get_teams():
   """Returns a list of all teams
   """
   return DB[TEAM_COLLECTION].find()
 
-
+def get_team_info(team_id):
+  """Returns all info associated with a team
+  """
+  team = DB[TEAM_COLLECTION].find_one({"_id": team_id})
+  runners = [r for r in DB[RUNNER_COLLECTION].find({"team_id": team_id})]
+  return {"team": team,
+      "runners": runners}
 # Meet utilities
 
 def create_meet(meet_name, **kwargs):
@@ -127,7 +171,7 @@ def get_meets():
   string_to_date(*meets)
   return meets
 
-# Meet utilities
+# Course utilities
 
 def create_course(course_name, **kwargs):
   """Creates a new course

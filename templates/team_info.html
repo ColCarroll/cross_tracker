@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %} - Team Info{% endblock %}
+
+{% macro display_roster(runners) %}
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Class</th>
+    </tr>
+  </thead>
+  {% for result in results %}
+  <tr>
+    <td>{{ result['display_name'] }} </td>
+    <td>{{ result['class'] }} </td>
+  </tr>
+  {% endfor %}
+</table>
+{% endmacro %}
+
+{% block content %}
+{{ display_roster(info['runners']) }}
+{% endblock %}
+
